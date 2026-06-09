@@ -1,0 +1,71 @@
+- name: Create minecraft system user
+  user:
+    name: minecraft
+    system: yes
+    home: /opt/minecraft
+    shell: /bin/bash
+    create_home: yes
+
+- name: Create server directory
+  file:
+    path: /opt/minecraft/server
+    state: directory
+    owner: minecraft
+    group: minecraft
+    mode: '0755'
+
+- name: Add Adoptium GPG key
+  apt_key:
+    url: https://packages.adoptium.net/artifactory/api/gpg/key/public
+    state: present
+
+- name: Add Adoptium repository
+  apt_repository:
+    repo: "deb https://packages.adoptium.net/artifactory/deb {{ ansible_distribution_release }} main"
+    state: present
+
+- name: Install Java 25
+  apt:
+    name: temurin-25-jre
+    state: present
+    update_cache: yes
+
+- name: Download Minecraft server JAR
+  get_url:  
+    url: "https://piston-data.mojang.com/v1/objects/97ccd4c0ed3f81bbb7bfacddd1090b0c56f9bc51/server.jar"
+    dest: /opt/minecraft/server/server.jar
+    owner: minecraft
+    group: minecraft
+    mode: '0644'
+
+#  get_url:
+#    url: "{{ minecraft_jar_url }}"
+#    dest: /opt/minecraft/server/server.jar
+#    owner: minecraft
+#    group: minecraft
+
+- name: Accept EULA
+  copy:
+    content: "eula=true\n"
+    dest: /opt/minecraft/server/eula.txt
+    owner: minecraft
+    group: minecraft
+
+- name: Deploy server.properties
+  template:
+    src: server.properties.j2
+    dest: /opt/minecraft/server/server.properties
+    owner: minecraft
+    group: minecraft
+
+- name: Deploy systemd service file
+  copy:
+    src: minecraft.service
+    dest: /etc/systemd/system/minecraft.service
+
+- name: Enable and start Minecraft service
+  systemd:
+    name: minecraft
+    enabled: yes
+    state: started
+    daemon_reload: yes

@@ -1,0 +1,16 @@
+[Unit]
+Description=Minecraft Java Edition Server
+After=network.target
+
+[Service]
+User=minecraft
+WorkingDirectory=/opt/minecraft/server
+ExecStart=/usr/bin/java -Xmx1024M -Xms1024M -jar server.jar nogui
+ExecStop=/bin/kill -s SIGINT $MAINPID
+KillSignal=SIGINT
+KillMode=process
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,6 @@
+- hosts: minecraft
+  become: yes
+  vars:
+    minecraft_jar_url: "{{ lookup('env', 'MINECRAFT_JAR_URL') }}"
+  roles:
+    - minecraft

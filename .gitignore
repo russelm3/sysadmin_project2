@@ -1,0 +1,9 @@
+# .gitignore
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/terraform.tfvars
+ansible/inventory.ini
+awscliv2.zip
+aws
+*.pem
